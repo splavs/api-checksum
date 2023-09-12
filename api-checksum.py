@@ -36,28 +36,27 @@ async def get_apis_checksum(session, urls, param_value):
 
 
 async def main():
-    async with aiohttp.ClientSession() as session:
-        with open('urls.txt', 'r') as urls_file:
-            urls_values = urls_file.read().splitlines()
+    with open('urls.txt', 'r') as urls_file:
+        urls_values = urls_file.read().splitlines()
 
-        with open('parameter_values.txt', 'r') as parameter_values_file:
-            params_values = parameter_values_file.read().splitlines()
+    with open('parameter_values.txt', 'r') as parameter_values_file:
+        params_values = parameter_values_file.read().splitlines()
+
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=100)) as session:
         tasks = []
         for param_value in params_values:
-            urls = []
-            for url_value in urls_values:
-                urls.append(url_value.format(param_value))
-
+            urls = [url_value.format(param_value) for url_value in urls_values]
             tasks.append(asyncio.ensure_future(get_apis_checksum(session, urls, param_value)))
 
         result = await asyncio.gather(*tasks)
-        total_checksum = 0
-        print("checksum calculated for all apis for each param")
-        for r in result:
-            print(f"param: {r[0]}, checksum: {r[1]}")
-            total_checksum += r[1]
 
-        print(f"checksum for all apis for all params: {total_checksum}")
+    total_checksum = 0
+    print("checksum calculated for all apis for each param")
+    for r in result:
+        print(f"param: {r[0]}, checksum: {r[1]}")
+        total_checksum += r[1]
+
+    print(f"checksum for all apis for all params: {total_checksum}")
 
 
 asyncio.run(main())
