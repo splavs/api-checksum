@@ -40,8 +40,8 @@ async def main():
         with open('urls.txt', 'r') as urls_file:
             urls_values = urls_file.read().splitlines()
 
-        with open('params.txt', 'r') as params_file:
-            params_values = params_file.read().splitlines()
+        with open('parameter_values.txt', 'r') as parameter_values_file:
+            params_values = parameter_values_file.read().splitlines()
         tasks = []
         for param_value in params_values:
             urls = []
