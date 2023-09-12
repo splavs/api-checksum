@@ -27,17 +27,18 @@ async def get_single_api_checksum(session, url):
 async def main():
     async with aiohttp.ClientSession() as session:
         tasks = []
-        for i in range(1, 15):
-            url = f'https://pokeapi.co/api/v2/pokemon/{i}'
-            tasks.append(asyncio.ensure_future(get_single_api_checksum(session, url)))
+        with open('urls.txt', 'r') as file:
+            urls = file.read().splitlines()
+            for url in urls:
+                tasks.append(asyncio.ensure_future(get_single_api_checksum(session, url)))
 
         result = await asyncio.gather(*tasks)
-        final_checksum = 0
+        total_checksum = 0
         for r in result:
-            print(r)
-            final_checksum += r[1]
+            print(r[0], r[1])
+            total_checksum += r[1]
 
-        print("Final checksum: ", final_checksum)
+        print("Total checksum: ", total_checksum)
 
 
 asyncio.run(main())
